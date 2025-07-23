@@ -1,0 +1,3 @@
+﻿  FileName.cpp
+D:\VS_C++\自己实现string\自己实现string\FileName.cpp(53,22): warning C4267: “return”: 从“size_t”转换到“int”，可能丢失数据
+  自己实现string.vcxproj -> D:\VS_C++\自己实现string\x64\Debug\自己实现string.exe

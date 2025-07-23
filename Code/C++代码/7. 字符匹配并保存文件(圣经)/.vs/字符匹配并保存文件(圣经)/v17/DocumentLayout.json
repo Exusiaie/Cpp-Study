@@ -1,0 +1,51 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\VS_C\u002B\u002B\\\u5B57\u7B26\u5339\u914D\u5E76\u4FDD\u5B58\u6587\u4EF6(\u5723\u7ECF)\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{DA7A9CB3-B4B6-4351-8566-5E9D83C2A6B5}|\u5B57\u7B26\u5339\u914D\u5E76\u4FDD\u5B58\u6587\u4EF6(\u5723\u7ECF)\\\u5B57\u7B26\u5339\u914D\u5E76\u4FDD\u5B58\u6587\u4EF6(\u5723\u7ECF).vcxproj|D:\\VS_C\u002B\u002B\\\u5B57\u7B26\u5339\u914D\u5E76\u4FDD\u5B58\u6587\u4EF6(\u5723\u7ECF)\\\u5B57\u7B26\u5339\u914D\u5E76\u4FDD\u5B58\u6587\u4EF6(\u5723\u7ECF)\\FileName.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DA7A9CB3-B4B6-4351-8566-5E9D83C2A6B5}|\u5B57\u7B26\u5339\u914D\u5E76\u4FDD\u5B58\u6587\u4EF6(\u5723\u7ECF)\\\u5B57\u7B26\u5339\u914D\u5E76\u4FDD\u5B58\u6587\u4EF6(\u5723\u7ECF).vcxproj|solutionrelative:\u5B57\u7B26\u5339\u914D\u5E76\u4FDD\u5B58\u6587\u4EF6(\u5723\u7ECF)\\FileName.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 1,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedHeight": 87,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "FileName.cpp",
+              "DocumentMoniker": "D:\\VS_C\u002B\u002B\\\u5B57\u7B26\u5339\u914D\u5E76\u4FDD\u5B58\u6587\u4EF6(\u5723\u7ECF)\\\u5B57\u7B26\u5339\u914D\u5E76\u4FDD\u5B58\u6587\u4EF6(\u5723\u7ECF)\\FileName.cpp",
+              "RelativeDocumentMoniker": "\u5B57\u7B26\u5339\u914D\u5E76\u4FDD\u5B58\u6587\u4EF6(\u5723\u7ECF)\\FileName.cpp",
+              "ToolTip": "D:\\VS_C\u002B\u002B\\\u5B57\u7B26\u5339\u914D\u5E76\u4FDD\u5B58\u6587\u4EF6(\u5723\u7ECF)\\\u5B57\u7B26\u5339\u914D\u5E76\u4FDD\u5B58\u6587\u4EF6(\u5723\u7ECF)\\FileName.cpp",
+              "RelativeToolTip": "\u5B57\u7B26\u5339\u914D\u5E76\u4FDD\u5B58\u6587\u4EF6(\u5723\u7ECF)\\FileName.cpp",
+              "ViewState": "AgIAAFoAAAAAAAAAAAAIwH8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-06-10T09:07:19.654Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedHeight": 87,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

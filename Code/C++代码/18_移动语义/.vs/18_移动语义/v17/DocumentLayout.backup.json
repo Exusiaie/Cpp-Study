@@ -1,0 +1,69 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\VS_C\u002B\u002B\\18_\u79FB\u52A8\u8BED\u4E49\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{4DD7C937-8A9F-433D-A0D8-3C8C8F94E26D}|18_\u79FB\u52A8\u8BED\u4E49\\18_\u79FB\u52A8\u8BED\u4E49.vcxproj|D:\\VS_C\u002B\u002B\\18_\u79FB\u52A8\u8BED\u4E49\\18_\u79FB\u52A8\u8BED\u4E49\\FileName.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{4DD7C937-8A9F-433D-A0D8-3C8C8F94E26D}|18_\u79FB\u52A8\u8BED\u4E49\\18_\u79FB\u52A8\u8BED\u4E49.vcxproj|solutionrelative:18_\u79FB\u52A8\u8BED\u4E49\\FileName.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\18388\\Desktop\\3th\\05_CppBase\\\u4E0A\u8BFE\u4EE3\u7801\\day16\\16_string.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "16_string.cpp",
+              "DocumentMoniker": "C:\\Users\\18388\\Desktop\\3th\\05_CppBase\\\u4E0A\u8BFE\u4EE3\u7801\\day16\\16_string.cpp",
+              "ToolTip": "C:\\Users\\18388\\Desktop\\3th\\05_CppBase\\\u4E0A\u8BFE\u4EE3\u7801\\day16\\16_string.cpp",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAAA8AAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-06-19T12:06:38.991Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "FileName.cpp",
+              "DocumentMoniker": "D:\\VS_C\u002B\u002B\\18_\u79FB\u52A8\u8BED\u4E49\\18_\u79FB\u52A8\u8BED\u4E49\\FileName.cpp",
+              "RelativeDocumentMoniker": "18_\u79FB\u52A8\u8BED\u4E49\\FileName.cpp",
+              "ToolTip": "D:\\VS_C\u002B\u002B\\18_\u79FB\u52A8\u8BED\u4E49\\18_\u79FB\u52A8\u8BED\u4E49\\FileName.cpp",
+              "RelativeToolTip": "18_\u79FB\u52A8\u8BED\u4E49\\FileName.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-06-19T09:17:23.182Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 1618,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

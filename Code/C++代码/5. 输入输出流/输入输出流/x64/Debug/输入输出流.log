@@ -1,0 +1,4 @@
+﻿  FileName.cpp
+D:\VS_C++\输入输出流\输入输出流\FileName.cpp(161,15): warning C4244: “初始化”: 从“std::streamoff”转换到“int”，可能丢失数据
+D:\VS_C++\输入输出流\输入输出流\FileName.cpp(166,16): warning C4244: “初始化”: 从“std::streamoff”转换到“int”，可能丢失数据
+  输入输出流.vcxproj -> D:\VS_C++\输入输出流\x64\Debug\输入输出流.exe
