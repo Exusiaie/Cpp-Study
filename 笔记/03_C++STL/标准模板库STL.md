@@ -25,7 +25,7 @@
 
 <img src="D:\MarkDown\Picture\image-20250625145837993.png" alt="image-20250625145837993" style="zoom:67%;" />
 
-#  二: 序列式容器
+#  二: 序列式容器 vector, deque, list
 
 序列式容器包括静态数组array、动态数组vector、双端队列deque、单链表forward_list、双向循环链表list
 
@@ -1579,7 +1579,7 @@ public:
         cout << "int Example::add(int, int)" << endl;
         return x + y;
     }
-};\
+};
 ```
 
 
