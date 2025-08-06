@@ -27,19 +27,238 @@
 
 #  二: 序列式容器 vector, deque, list
 
-序列式容器包括静态数组array、动态数组vector、双端队列deque、单链表forward_list、双向循环链表list
+## 1: vector
 
 **静态数组array**中保存的是一个传统的c数组, 它的大小在创建时就确定, 后续不可更改
 
-**动态数组vector**中保存着start, finish, end_of_storage三个指针, 指向堆上的一片连续空间, 分别指向容器的开头, 容器有效位置尾部, 和容器总空间的尾部的后一个位置. 这使得动态数组可以在总空间不够时进行扩容. 扩容的大小在LINUX上是2倍扩容, 扩容时先在堆上申请2倍大小的新空间, 在将这三个指针指向相应位置, 让os自动回收旧空间. 
+**动态数组vector**中保存着start, finish, end_of_storage三个指针, 指向堆上的一片连续空间, 分别指向容器的开头, 容器有效位置尾部, 和容器总空间的尾部的后一个位置. 
 
-迭代器失效动态数组在进行插入删除时导致迭代器指向的元素位置失效, 进行扩容操作后会出现迭代器失效, 因此每次插入删除后都要更新迭代器的位置
+这使得动态数组可以在总空间不够时进行扩容. 扩容的大小在LINUX上是2倍扩容, 扩容时先在堆上申请2倍大小的新空间, 在将这三个指针指向相应位置, 让os自动回收旧空间. 
+
+迭代器失效: 动态数组在进行插入删除时导致迭代器指向的元素位置失效, 进行扩容操作后会出现迭代器失效, 因此每次插入删除后都要更新迭代器的位置
 
 ![image-20250625144005441](D:\MarkDown\Picture\image-20250625144005441.png)
 
-**双端队列deque**是一个逻辑上连贯, 物理上由一个个离散的block组成的数据结构 , 每个block的大小固定, deque中保存着一个中控器数组Map, 里面保存着所有的block的首地址, 每个block中拥有cur, first, last, node四个指针, 分别指向当前元素位置, 第一个元素位置, 最后元素位置的下一个位置, Map当前索引的位置. 当++it或--it时, cur相应++和--, 当跨block访问时, node会++或--, 并让cur, first, last指向新的block, node解引用即得到first地址 last指针的地址由(first+block_size)得到. 双端队列在进行Map扩容后会出现迭代器失效, 因此每次插入删除后都要更新迭代器位置.
+### 常用操作
+
+**初始化**
+
+>1.   无参对象
+>2.   count个value
+>3.   迭代器范围
+>4.   大括号范围
+>5.   拷贝构造, 移动构造
+
+**遍历**
+
+>1.   迭代器遍历
+>2.   下标
+>3.   增强for循环
+
+**头插尾插**
+
+>1.   push_back
+>2.   emplace_back
+>3.   push_front
+>4.   emplace_front
+
+**指定位置插入**
+
+>1.   指定位置插入一个元素
+>2.   指定位置插入count个相同元素
+>3.   指定位置插入迭代器范围的元素
+
+### <span style=color:red;background:yellow;font-size:30px>vector的迭代器失效</span>
+
+以vector为例，如果使用insert插入元素，而每次插入元素的个数不确定，可能剩余空间不足以存放插入元素的个数，那么insert在插入的时候**底层就可能导致扩容，从而导致迭代器还指向老的空间，继续使用该迭代器会出现迭代器失效的问题**。
+
+```c++
+void test1() {
+	vector<int> vec = { 11, 22, 33, 44, 55};
+	vector<int> num = { 0, 1, 2, 3, 4, 5}; // num的初始capacity为6
+
+	auto it = num.begin() + 2;
+	cout << "*it = " << *it << endl;
+    
+#if 0
+	num.insert(it, vec.begin(), vec.end());  // 此时num的capacity不足, 触发扩容, vector的三根指针指向了新的堆空间
+											 // 扩容一旦发生，旧堆区被释放，但此时的迭代器it依然指向旧的堆空间, 这就是vector的迭代器失效
+	Print(num);
+	cout << "*it = " << *it << endl; // ERROR, 此时的it已经成为悬空指针
+#endif
+    
+	// 解决方法: 在每次扩容后更新迭代器it
+	it = num.insert(it, vec.begin(), vec.end()); // 此时迭代器it已经指向新的堆空间, 避免了失效
+												 // insert 的返回值是一个 iterator
+	Print(num);
+	cout << "*it = " << *it << endl;
+}
+
+```
+
+<img src="D:\MarkDown\Picture\image-20250625165541859.png" alt="image-20250625165541859" style="zoom:67%;" />
+
+<font color = red>迭代器失效的本质是指针悬空</font>
+
+**思考：insert插入数据导致容量不够，底层是不是也采用类似vector的push_back一样的两倍扩容呢？**
+
+>因为vector的push_back操作每次只会插入一个元素，所以可以按照统一的形式2 * capacity()，但是insert的时候，插入的元素个数是不定的，所以就不能一概而论。这里可以分别讨论一下，我们设置capacity() = n, size() = m, insert插入的元素个数为t个：
+>
+>```
+>capacity = n ---------
+>size = m     ----
+>```
+>
+>- 如果t < n - m，新插入元素的个数比剩余空间小，这个时候就无需扩容，所以直接插入;
+>- 如果n - m < t < m，就按照m的2倍去进行扩容，新的空间就是2 * m；
+>- 如果n - m< t < n 且t > m,就按照 t + m去进行扩容；
+>- 如果t > n时，依旧按照t + m去进行扩容 ； 
+>
+>这就是vector进行insert扩容的原理（这个原理可以了解一下，主要是为了告诉大家不是两倍扩容）。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 2: deque
+
+**双端队列deque**是一个逻辑上连贯, 物理上由一个个离散的片段组成的数据结构 , 每个片段的大小固定, deque中保存着一个中控器数组Map, 里面保存着所有片段的首地址
+
+每个片段中拥有cur, first, last, node四个指针, 分别指向当前元素位置, 第一个元素位置, 最后元素位置的下一个位置, Map当前索引的位置. 
+
+双端队列在进行Map扩容后会出现迭代器失效, 因此每次插入删除后都要更新迭代器位置.
 
 ![image-20250625144245906](D:\MarkDown\Picture\image-20250625144245906.png)
+
+
+
+
+
+### deque的迭代器失效
+
+deque的迭代器失效比vector的迭代器失效更加容易触发, C++ 标准对 deque 的迭代器失效有个非常清晰的规定：
+
+ **对两端的插入/删除（`push_front`/`push_back`）和所有中间插入/删除操作，都会使所有现有迭代器失效**。
+
+```c++
+void test(){
+	deque<int> dq = { 0, 1, 2 , 3};
+	auto it = dq.begin() + 1;   // 指向元素 1
+	int& ref = dq[1];           // 引用也指向元素 1
+	int* ptr = &dq[1];          // 指针指向元素 1
+
+	dq.push_back(77);            // 插入新元素，迭代器 it 失效
+	Print(dq);
+	it = dq.insert(it, 10, 99);       // it 早已失效，再用它插入会导致 未定义行为
+	Print(dq);
+ 
+	cout << *it << "\n"; //  it 现在是悬空的，再解引用是未定义行为：
+
+	// 但下面两行仍然安全，因为引用和指针对应的元素并未搬迁
+	cout << ref << "\n";  // 输出 1
+	cout << *ptr << "\n"; // 输出 1
+}
+```
+
+<span style=color:red;background:yellow;font-size:20px>vector和deque的迭代器失效的区别: </span>
+
+vector的迭代器只出现在扩容时, 而deque的迭代器失效会发生在所有的两端插入/删除和中间插入删除时, 即使deque没有真的发生了扩容和内存搬迁, 这样规定的目的是提前规避bug
+
+
+
+### deque的插入和删除时内存变化
+
+![image-20250625144245906](D:\MarkDown\Picture\image-20250625144245906.png)
+
+1. deque的减少移动时开销策略
+
+deque在插入或删除元素时, 需要看操作位置与size()的一半的大小，根据这个判断是挪动前一半还是后一半, 以减少开销
+
+2. deque的插入逻辑:
+
+​	 如果在第一个位置插, 直接调用push_front(), 如果在最后一个位置插, 直接调用push_back(), 如果在中间插, 先用头位置-目标位置, 判断是在前一半插还是在后一半插, 前一半就前移元素再插入, 后一半就后移元素再插入
+
+3. deque指针的变化
+
+    1. 在一个block中移动
+
+        ```c++
+        ++it 时，只做 _M_cur++；
+        --it 时，只做 _M_cur--；
+        只要仍在 [ _M_first, _M_last ) 范围内，_M_node 不变。
+        ```
+
+    2. 跨block移动, 逻辑上deque是连续的, 实际上从一个缓冲区block跳到了另外一个
+
+        ```c++
+        if(++it 后 _M_cur == _M_last){
+            _M_node++; // 偏移到Map的下一个成员
+        	_M_first = *(_M_node); // 取地址得到下一个block的首地址, 让first指针指过去
+        	_M_last  = _M_first + buffer_size; // 首地址 + 一个block的大小 = last
+        	_M_cur   = _M_first; // 当前位置为block首位
+        }
+        
+        if( --it 后 _M_cur < _M_first){
+            _M_node--; // 偏移到Map的上一个成员
+        	_M_first = *(_M_node); // 取地址
+        	_M_last  = _M_first + buffer_size; // 得到last
+        	_M_cur   = _M_last - 1; // 当前位置为block的最后一个位置
+        }
+        ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 3: 双向循环链表list
 
 **双向循环链表list**在第一个结点和最后一个结点之间存在一个空节点, 这使得list.end方便的实现, list.end == list.begin成为判空条件, 且统一了插入和删除操作
 
@@ -47,9 +266,15 @@ list是一个带尾部空节点的双向循环链表, 如果没有这个空节�
 
 ![image-20250623210707324](D:\MarkDown\Picture\image-20250623210707324.png)
 
+
+
+## 4: 相关操作
+
+
+
 我们主要看vector, list, deque这三种数据结构
 
-## 5种初始化
+**5种初始化**
 
 1. 无参对象
 
@@ -94,7 +319,7 @@ vector<int> number = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
 
 
-## 2种遍历
+**2种遍历**
 
 1. 使用下标遍历
 
@@ -129,7 +354,7 @@ cout << endl;
 
 
 
-## 在尾部进行插入与删除
+**在尾部进行插入与删除**
 
 ```c++
 // push_back会在容器的.end()位置调用元素自己的拷贝构造函数或者是移动构造函数
@@ -142,7 +367,7 @@ number.pop_back();
 
 
 
-## 在头部进行插入与删除
+**在头部进行插入与删除**
 
 ```c++
 cout << "deque和list均可以在头部插入删除" << endl;
@@ -160,7 +385,7 @@ number.pop_front();
 
 
 
-## 在任意位置插入 / 3种insert 
+**在任意位置插入 / 3种insert**
 
 三种序列式容器在任意位置进行插入的操作是insert函数，三种容器都适合
 
@@ -237,135 +462,13 @@ insert在任意位置进行插入，list使用起来很好，没有任何问题�
 
 
 
-### <span style=color:red;background:yellow;font-size:30px>vector的迭代器失效</span>
-
-以vector为例，如果使用insert插入元素，而每次插入元素的个数不确定，可能剩余空间不足以存放插入元素的个数，那么insert在插入的时候**底层就可能导致扩容，从而导致迭代器还指向老的空间，继续使用该迭代器会出现迭代器失效的问题**。
-
-```c++
-void test1() {
-	vector<int> vec = { 11, 22, 33, 44, 55};
-	vector<int> num = { 0, 1, 2, 3, 4, 5}; // num的初始capacity为6
-
-	auto it = num.begin() + 2;
-	cout << "*it = " << *it << endl;
-    
-#if 0
-	num.insert(it, vec.begin(), vec.end());  // 此时num的capacity不足, 触发扩容, vector的三根指针指向了新的堆空间
-											 // 扩容一旦发生，旧堆区被释放，但此时的迭代器it依然指向旧的堆空间, 这就是vector的迭代器失效
-	Print(num);
-	cout << "*it = " << *it << endl; // ERROR, 此时的it已经成为悬空指针
-#endif
-    
-	// 解决方法: 在每次扩容后更新迭代器it
-	it = num.insert(it, vec.begin(), vec.end()); // 此时迭代器it已经指向新的堆空间, 避免了失效
-												 // insert 的返回值是一个 iterator
-	Print(num);
-	cout << "*it = " << *it << endl;
-}
-
-```
-
-<img src="D:\MarkDown\Picture\image-20250625165541859.png" alt="image-20250625165541859" style="zoom:67%;" />
-
-<font color = red>迭代器失效的本质是指针悬空</font>
-
-**思考：insert插入数据导致容量不够，底层是不是也采用类似vector的push_back一样的两倍扩容呢？**
-
->因为vector的push_back操作每次只会插入一个元素，所以可以按照统一的形式2 * capacity()，但是insert的时候，插入的元素个数是不定的，所以就不能一概而论。这里可以分别讨论一下，我们设置capacity() = n, size() = m, insert插入的元素个数为t个：
->
->```
->capacity = n ---------
->size = m     ----
->```
->
->- 如果t < n - m，新插入元素的个数比剩余空间小，这个时候就无需扩容，所以直接插入;
->- 如果n - m < t < m，就按照m的2倍去进行扩容，新的空间就是2 * m；
->- 如果n - m< t < n 且t > m,就按照 t + m去进行扩容；
->- 如果t > n时，依旧按照t + m去进行扩容 ； 
->
->这就是vector进行insert扩容的原理（这个原理可以了解一下，主要是为了告诉大家不是两倍扩容）。
->
 
 
 
-## deque的迭代器失效
-
-deque的迭代器失效比vector的迭代器失效更加容易触发, C++ 标准对 deque 的迭代器失效有个非常清晰的规定：
-
- **对两端的插入/删除（`push_front`/`push_back`）和所有中间插入/删除操作，都会使所有现有迭代器失效**。
-
-```c++
-void test(){
-	deque<int> dq = { 0, 1, 2 , 3};
-	auto it = dq.begin() + 1;   // 指向元素 1
-	int& ref = dq[1];           // 引用也指向元素 1
-	int* ptr = &dq[1];          // 指针指向元素 1
-
-	dq.push_back(77);            // 插入新元素，迭代器 it 失效
-	Print(dq);
-	it = dq.insert(it, 10, 99);       // it 早已失效，再用它插入会导致 未定义行为
-	Print(dq);
- 
-	cout << *it << "\n"; //  it 现在是悬空的，再解引用是未定义行为：
-
-	// 但下面两行仍然安全，因为引用和指针对应的元素并未搬迁
-	cout << ref << "\n";  // 输出 1
-	cout << *ptr << "\n"; // 输出 1
-}
-```
-
-<span style=color:red;background:yellow;font-size:20px>vector和deque的迭代器失效的区别: </span>
-
-vector的迭代器只出现在扩容时, 而deque的迭代器失效会发生在所有的两端插入/删除和中间插入删除时, 即使deque没有真的发生了扩容和内存搬迁, 这样规定的目的是提前规避bug
 
 
 
-### deque的插入和删除时内存变化
-
-![image-20250625144245906](D:\MarkDown\Picture\image-20250625144245906.png)
-
-1. deque的减少移动时开销策略
-
-deque在插入或删除元素时, 需要看操作位置与size()的一半的大小，根据这个判断是挪动前一半还是后一半, 以减少开销
-
-2. deque的插入逻辑:
-
-​	 如果在第一个位置插, 直接调用push_front(), 如果在最后一个位置插, 直接调用push_back(), 如果在中间插, 先用头位置-目标位置, 判断是在前一半插还是在后一半插, 前一半就前移元素再插入, 后一半就后移元素再插入
-
-3. deque指针的变化
-
-    1. 在一个block中移动
-
-        ```c++
-        ++it 时，只做 _M_cur++；
-        --it 时，只做 _M_cur--；
-        只要仍在 [ _M_first, _M_last ) 范围内，_M_node 不变。
-        ```
-
-    2. 跨block移动, 逻辑上deque是连续的, 实际上从一个缓冲区block跳到了另外一个
-
-        ```c++
-        if(++it 后 _M_cur == _M_last){
-            _M_node++; // 偏移到Map的下一个成员
-        	_M_first = *(_M_node); // 取地址得到下一个block的首地址, 让first指针指过去
-        	_M_last  = _M_first + buffer_size; // 首地址 + 一个block的大小 = last
-        	_M_cur   = _M_first; // 当前位置为block首位
-        }
-        
-        if( --it 后 _M_cur < _M_first){
-            _M_node--; // 偏移到Map的上一个成员
-        	_M_first = *(_M_node); // 取地址
-        	_M_last  = _M_first + buffer_size; // 得到last
-        	_M_cur   = _M_last - 1; // 当前位置为block的最后一个位置
-        }
-        ```
-
-
------------------------
-
-
-
-## 在任意位置删除元素
+**在任意位置删除元素**
 
 三种序列式容器的删除操作是erase函数，函数接口如下
 
@@ -391,7 +494,7 @@ it = vec.erase(it);
 
 
 
-## 其他操作:    获取元素个数 \ 清空元素 \ 重置元素个数 \ 交换两个容器的内容\ 获取头部元素尾部元素
+**其他操作:    获取元素个数 \ 清空元素 \ 重置元素个数 \ 交换两个容器的内容\ 获取头部元素尾部元素**
 
 三种序列式容器vector、deque、list都支持元素的清空clear函数 \ 获取元素个数的size函数 \ 重置元素个数的resize函数 \ 交换两个同类型容器元素的swap函数
 
@@ -453,7 +556,7 @@ void swap( vector& other );
 
 
 
- ## emplace系列函数
+**emplace系列函数**
 
 `emplace` 系列函数是 C++11 引入的，是对传统 `insert`/`push_back` 等函数的性能优化版本，广泛用于 STL 容器中（如 `vector`, `deque`, `list`, `map`, `set` 等）。
 
@@ -492,7 +595,7 @@ vec.emplace_back(...); // 直接在 vector 的末尾原地构造对象
 
 
 
-## list的特殊操作
+## 5: list的特殊操作
 
 因为是链表, list有reverse()逆置, sort()排序, unique()去重, merge()合并, splice()移动 五个特有的操作
 
@@ -636,7 +739,7 @@ void homework3() {
 
 
 
-# 序列式容器总结
+## 序列式容器总结
 
 5种初始化,
 
@@ -684,9 +787,9 @@ vector和deque的迭代器失效有什么区别?
 
 
 
-# 三: 关联式容器
+# 三: 关联式容器 set, multiset, map, multimap
 
-## pair模板结构
+## 1: pair模板结构
 
 `std::pair` 用来把两个类型可能不同的值“打包”在一起，形成一个简单的二元组
 
@@ -772,11 +875,9 @@ p2: 2 -> two
 
 
 
-## 有序关联式容器
+## 2:    set
 
-### 一:    set
-
-set的基本特征:
+**set的基本特征:**
 
 1. 存放的是key类型，key值是唯一的，不能重复
 2. 默认情况下，会按照key值进行升序排列
@@ -843,7 +944,7 @@ set的insert操作
 
 
 
-### 二:    multiset
+## 3:    multiset
 
 multiple a.多种多样的   compare v.比较    Allocator 内存分配器
 
@@ -882,7 +983,7 @@ cout << *ret.second << endl; // 输出4
 
 
 
-### 三:    map
+## 4:    map
 
 基本特征:
 
@@ -974,7 +1075,7 @@ map的下标: 带有const的map不可使用下标操作
 
 
 
-### 四:    multimap
+## 5:    multimap
 
 1. 存放的是key-value类型, key值是不唯一的, key值和value值可以重复
 2. 默认情况下, 会按key值进行升序排序
@@ -989,7 +1090,7 @@ multimap的查找（count、find）、插入（insert）、删除（erase）与m
 
 
 
-### 有序关联式容器总结
+## 6: 有序关联式容器总结
 
 1、所有关联式容器中的元素是<span style=color:red;background:yellow;font-size:20px>有序的</span>, 即使存入的时候是无序的, 容器内也会变成有序；
 
@@ -1003,13 +1104,13 @@ multimap的查找（count、find）、插入（insert）、删除（erase）与m
 
 
 
-## 无序关联式容器
+# 四: 无序关联式容器 unordered_set, unordered_multiset, unordered_map, unordered_multimap
 
 STL中无序关联式容器的底层实现都是哈希表, 解决哈希冲突的问题一般采用链地址法
 
 <img src="D:\MarkDown\Picture\image-20250628160246676.png" alt="image-20250628160246676" style="zoom:67%;" />
 
-### unordered_set
+## 1: unordered_set
 
 基本特征:
 
@@ -1027,7 +1128,7 @@ unordered_set的查找（count、find）、插入（insert）、删除（erase�
 
 
 
-### unordered_multiset
+## 2: unordered_multiset
 
 基本特征
 
@@ -1045,7 +1146,7 @@ unordered_multiset针对于自定义类型的写法与unordered_set是完全一�
 
 
 
-### unordered_map
+## 3: unordered_map
 
 基本特征
 
@@ -1061,7 +1162,7 @@ unordered_map的查找（count、find）、插入（insert）、删除（erase�
 
 
 
-### unordered_multimap
+## 4: unordered_multimap
 
 基本特征
 
@@ -1073,7 +1174,7 @@ unordered_multimap的查找（count、find）、插入（insert）、删除（er
 
 
 
-### 无序关联式容器总结
+## 5: 无序关联式容器总结
 
 1、所有无序关联式容器中的元素是<span style=color:red;background:yellow;font-size:20px>无序的</span>, 即使输入的时候是有序的, 存入容器中也会变的无序;
 
@@ -1085,7 +1186,7 @@ unordered_multimap的查找（count、find）、插入（insert）、删除（er
 
 
 
-# <span style=color:red;background:yellow;font-size:30px>如何选择容器（重要）</span>
+# 五: <span style=color:red;background:yellow;font-size:30px>如何选择容器（重要）</span>
 
  1、元素是不是有序的
 
@@ -1148,7 +1249,7 @@ copy函数用来打印
 
 
 
-# 四:  算法
+# 六:  算法
 
 ## 迭代器
 
